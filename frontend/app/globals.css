@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-green: #16A34A;
+  --color-brand-green-hover: #15803D;
+  --color-brand-green-light: #E6F4EA;
+  --color-brand-gray: #F3F4F6;
+  --color-brand-border: #E5E7EB;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}

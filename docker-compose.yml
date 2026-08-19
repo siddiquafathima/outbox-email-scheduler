@@ -1,0 +1,87 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: scheduler-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  mysql:
+    image: mysql:8.0
+    container_name: scheduler-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: email_scheduler
+      MYSQL_USER: scheduler_user
+      MYSQL_PASSWORD: scheduler_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: scheduler-backend
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: 4000
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: scheduler_user
+      DB_PASSWORD: scheduler_pass
+      DB_NAME: email_scheduler
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      ETHEREAL_USER: ${ETHEREAL_USER}
+      ETHEREAL_PASS: ${ETHEREAL_PASS}
+      WORKER_CONCURRENCY: 5
+      MIN_DELAY_BETWEEN_EMAILS_MS: 2000
+    depends_on:
+      - mysql
+      - redis
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.worker
+    container_name: scheduler-worker
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: scheduler_user
+      DB_PASSWORD: scheduler_pass
+      DB_NAME: email_scheduler
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      ETHEREAL_USER: ${ETHEREAL_USER}
+      ETHEREAL_PASS: ${ETHEREAL_PASS}
+      WORKER_CONCURRENCY: 5
+      MIN_DELAY_BETWEEN_EMAILS_MS: 2000
+    depends_on:
+      - mysql
+      - redis
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: scheduler-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      AUTH_SECRET: ${AUTH_SECRET}
+      AUTH_GOOGLE_ID: ${AUTH_GOOGLE_ID}
+      AUTH_GOOGLE_SECRET: ${AUTH_GOOGLE_SECRET}
+      NEXT_PUBLIC_API_BASE: http://backend:4000/api
+    depends_on:
+      - backend
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  redis-data:
+  mysql-data:
