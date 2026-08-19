@@ -135,4 +135,4 @@ Scheduling 1000+ emails for the same time creates 1000+ individual delayed jobs 
 
 ## Demo Video
 
-See [link] — covers: scheduling from the dashboard, the Scheduled/Sent views, a live restart-persistence demonstration (stop worker → confirm job survives in Redis → restart → auto-fires), and rate-limiting behavior under a low hourly cap.
+See https://drive.google.com/file/d/1vE1ARGQJ198YlAYUKy3HroZoWrhq-wui/view?usp=sharing — covers: scheduling from the dashboard, the Scheduled/Sent views, a live restart-persistence demonstration (stop worker → confirm job survives in Redis → restart → auto-fires), and rate-limiting behavior under a low hourly cap.
